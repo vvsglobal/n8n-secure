@@ -1,13 +1,20 @@
-FROM node:20-bullseye-slim
+# Use official n8n image as base (includes n8n, Node.js, Chromium)
+FROM n8nio/n8n:latest
 
-# Use non-root user
-RUN useradd -m n8nuser
-USER n8nuser
-WORKDIR /home/n8nuser
+# Switch to root to install Puppeteer plugins
+USER root
 
-# Install Puppeteer + plugin + n8n
-RUN npm install puppeteer puppeteer-extra puppeteer-extra-plugin-user-data-dir n8n
+# Install Puppeteer Extra and plugins
+RUN npm install --no-save \
+    puppeteer-extra \
+    puppeteer-extra-plugin-stealth \
+    puppeteer-extra-plugin-user-data-dir
 
-EXPOSE 5679
+# Switch back to n8n user
+USER node
 
-CMD ["n8n", "start", "--external", "--task-runner-mode=external"]
+# Expose default n8n port
+EXPOSE 5678
+
+# Start n8n in external task runner mode
+CMD ["n8n", "start", "--tunnel", "--task-runner-mode=external"]
