@@ -1,9 +1,18 @@
+version: "3.9"
+
 services:
   n8n-puppeteer-runner:
     build:
-      context: ./runner
+      context: ./runner       # folder containing your Dockerfile
+      dockerfile: Dockerfile  # optional if named Dockerfile
     container_name: n8n-puppeteer-runner
     environment:
       - N8N_EXTERNAL_RUNNER_MODE=true
       - N8N_TASK_RUNNER_MODE=external
     restart: always
+    networks:
+      - n8n-network           # make sure this matches your main n8n network
+
+networks:
+  n8n-network:
+    external: true
